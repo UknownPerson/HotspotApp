@@ -1,5 +1,7 @@
 import os
 import sys
+import webbrowser
+from ToolTip import ToolTip
 from tkinter import *
 from tkinter import messagebox
 
@@ -17,18 +19,20 @@ def run():
     window = Tk()
     window.withdraw()
 
-    saved_ssid, saved_pwd = read_config()
+    saved_ssid, saved_pwd, auto_start = read_config()
 
     window.ssid_var = StringVar(value=saved_ssid)
     window.pwd_var = StringVar(value=saved_pwd)
+    window.autosave_var = IntVar(value=int(auto_start))
 
     def on_change(*args):
-        save_config(window.ssid_var.get(), window.pwd_var.get())
+        save_config(window.ssid_var.get(), window.pwd_var.get(), window.autosave_var.get())
 
     on_change()
 
     window.ssid_var.trace_add("write", on_change)
     window.pwd_var.trace_add("write", on_change)
+    window.autosave_var.trace_add("write", on_change)
 
     window.title_ = '热点'
     window.suffix = ''
@@ -70,6 +74,25 @@ def run():
 
     but1 = Button(window, text="开启热点", bd=3)
     but1.place(x=240, y=14)
+
+    cbt1 = Checkbutton(window, text="开机自启动\n并打开热点", bd=1, variable=window.autosave_var)
+    cbt1.place(x=226, y=50)
+
+    tooltip_text = "勾选后程序会随系统开机自动启动，并且在每次程序打开时自动开启热点。"
+    ToolTip(cbt1, tooltip_text)
+
+    def open_link(url):
+        webbrowser.open(url)
+
+    men1 = Menu(window, tearoff=0)
+    men1.add_command(label="作者：ukn",state="disabled")
+    men1.add_command(label="开源免费工具，请勿倒卖",state="disabled")
+    men1.add_command(label="打开 Github 项目地址", command=lambda: open_link("github.com/UknownPerson/HotspotApp/"))
+
+    def show_menu(event):
+        men1.post(event.x_root, event.y_root)
+
+    window.bind("<Button-3>", show_menu)
 
     window.deiconify()
 
@@ -146,4 +169,8 @@ def run():
 
     but1.config(command=on_button_click)
     window.after(0, refresh_button, 1000)
+
+    if window.autosave_var.get() == 1 and not asyncio.run_coroutine_threadsafe(getStates(), loop).result():
+        but1.invoke()
+
     window.mainloop()
