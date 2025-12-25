@@ -1,5 +1,3 @@
-import os
-import sys
 import webbrowser
 from ToolTip import ToolTip
 from tkinter import *
@@ -46,15 +44,15 @@ def run():
 
     window.iconbitmap(icon_path)
 
-    window.geometry('320x100')
+    window.geometry('340x100')
     window.resizable(False, False)
 
     lab1 = Label(window, text="热点名称：")
     lab2 = Label(window, text="热点密码：")
-    lab3 = Label(window, text="作者：ukn")
+    #lab3 = Label(window, text="作者：ukn")
     lab1.place(x=10, y=20)
     lab2.place(x=10, y=60)
-    lab3.place(x=240, y=60)
+    #lab3.place(x=240, y=60)
 
     frame1_1 = Frame(window, bg="gray", padx=1, pady=1)
     frame1_1.place(x=76, y=16)
@@ -73,10 +71,10 @@ def run():
     ent2.pack()
 
     but1 = Button(window, text="开启热点", bd=3)
-    but1.place(x=240, y=14)
+    but1.place(x=260, y=14)
 
     cbt1 = Checkbutton(window, text="开机自启动\n并打开热点", bd=1, variable=window.autosave_var)
-    cbt1.place(x=226, y=50)
+    cbt1.place(x=246, y=50)
 
     tooltip_text = "勾选后程序会随系统开机自动启动，并且在每次程序打开时自动开启热点。"
     ToolTip(cbt1, tooltip_text)
