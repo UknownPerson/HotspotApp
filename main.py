@@ -3,9 +3,6 @@ import ui
 from winsdk.windows.networking.connectivity import NetworkInformation
 from winsdk.windows.networking.networkoperators import NetworkOperatorTetheringManager, TetheringOperationalState
 
-hotspot_ssid = "test"
-hotspot_passphrase = "12345678"
-
 
 async def enable(tethering_manager, ssid, passphrase):
     print("enabling...")
@@ -21,22 +18,6 @@ async def enable(tethering_manager, ssid, passphrase):
 async def disable(tethering_manager):
     print("disabling...")
     return await tethering_manager.stop_tethering_async()
-
-
-# noinspection PyTypeChecker
-async def main():
-    internet_connection_profile = NetworkInformation.get_internet_connection_profile()
-
-    if internet_connection_profile is None:
-        print("No internet connection profile found.")
-        return
-
-    tethering_manager = NetworkOperatorTetheringManager.create_from_connection_profile(internet_connection_profile)
-
-    if tethering_manager.tethering_operational_state == TetheringOperationalState.ON:
-        await on_disabled(tethering_manager)
-    else:
-        await on_enabled(tethering_manager, hotspot_ssid, hotspot_passphrase)
 
 
 async def getStates():
