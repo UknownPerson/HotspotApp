@@ -1,0 +1,1 @@
+pyinstaller --clean --onefile --windowed --name HotspotApp --icon icon64.ico --paths src --paths .venv\Lib\site-packages --hidden-import winsdk.windows.networking.connectivity --hidden-import winsdk.windows.networking.networkoperators --add-data "icon64.ico;." --version-file ver.txt src\main.py
