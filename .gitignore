@@ -1,30 +1,27 @@
-/ver.txt
-/main.spec
-/nuitka-crash-report.xml
-/HotspotApp.spec
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build outputs
+build/
+dist/
+*.spec
+nuitka-crash-report.xml
+
+# Local build metadata
 /build.txt
-/dist/
-/.idea/.idea/.gitignore
-/.idea/.gitignore
-/.idea/.idea/.name
-/.idea/.name
-/build/HotspotApp/Analysis-00.toc
-/build/HotspotApp/base_library.zip
-/build/HotspotApp/EXE-00.toc
-/.idea/.idea/HotspotApp.iml
-/.idea/HotspotApp.iml
-/build/HotspotApp/HotspotApp.pkg
-/.idea/.idea/misc.xml
-/.idea/misc.xml
-/.idea/.idea/modules.xml
-/.idea/modules.xml
-/build/HotspotApp/PKG-00.toc
-/.idea/.idea/inspectionProfiles/profiles_settings.xml
-/.idea/inspectionProfiles/profiles_settings.xml
-/.idea/.idea/inspectionProfiles/Project_Default.xml
-/.idea/inspectionProfiles/Project_Default.xml
-/build/HotspotApp/PYZ-00.pyz
-/build/HotspotApp/PYZ-00.toc
-/.idea/vcs.xml
-/build/HotspotApp/warn-HotspotApp.txt
-/build/HotspotApp/xref-HotspotApp.html
+/ver.txt
+
+# IDE/editor files
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

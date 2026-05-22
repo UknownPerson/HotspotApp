@@ -1,0 +1,1 @@
+"""HotspotApp source package."""

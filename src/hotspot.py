@@ -1,5 +1,3 @@
-import ui
-
 from winsdk.windows.networking.connectivity import NetworkInformation
 from winsdk.windows.networking.networkoperators import NetworkOperatorTetheringManager, TetheringOperationalState
 
@@ -32,7 +30,3 @@ async def getStates():
         return True
     else:
         return False
-
-
-if __name__ == "__main__":
-    ui.run()

@@ -1,13 +1,14 @@
+import threading
 import webbrowser
+
 from ToolTip import ToolTip
 from tkinter import *
 from tkinter import messagebox
 
-from main import *
 from config import *
+from hotspot import *
 
 import asyncio
-import threading
 
 
 def run():
@@ -40,7 +41,8 @@ def run():
     if hasattr(sys, "_MEIPASS"):
         icon_path = os.path.join(sys._MEIPASS, "icon64.ico")
     else:
-        icon_path = os.path.join(os.path.dirname(__file__), "icon64.ico")
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        icon_path = os.path.join(project_root, "icon64.ico")
 
     window.iconbitmap(icon_path)
 
