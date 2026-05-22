@@ -1,3 +1,5 @@
+import os
+import sys
 import threading
 import webbrowser
 
@@ -5,8 +7,8 @@ from ToolTip import ToolTip
 from tkinter import *
 from tkinter import messagebox
 
-from config import *
-from hotspot import *
+from config import read_config, save_config
+from hotspot import NetworkInformation, NetworkOperatorTetheringManager, disable, enable, getStates
 
 import asyncio
 
@@ -39,10 +41,10 @@ def run():
     window.title(f"{window.title_} {window.suffix}")
 
     if hasattr(sys, "_MEIPASS"):
-        icon_path = os.path.join(sys._MEIPASS, "icon64.ico")
+        icon_path = os.path.join(sys._MEIPASS, "assets", "icon64.ico")
     else:
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        icon_path = os.path.join(project_root, "icon64.ico")
+        icon_path = os.path.join(project_root, "assets", "icon64.ico")
 
     window.iconbitmap(icon_path)
 

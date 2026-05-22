@@ -34,22 +34,6 @@ pip install -r requirements.txt
 
 当前项目依赖 Windows Runtime 相关包，依赖列表见 [requirements.txt](requirements.txt)。
 
-## 打包
-
-安装打包依赖：
-
-```powershell
-pip install -r requirements-dev.txt
-```
-
-项目使用 PyInstaller 打包，当前构建命令保存在 `build.txt`：
-
-```powershell
-pyinstaller --clean --onefile --windowed --name HotspotApp --icon icon64.ico --paths src --paths .venv\Lib\site-packages --hidden-import winsdk.windows.networking.connectivity --hidden-import winsdk.windows.networking.networkoperators --add-data "icon64.ico;." --version-file ver.txt src\main.py
-```
-
-打包产物会输出到 `dist/` 目录。
-
 ## 开源协议
 
 本项目基于 Apache License 2.0 开源，详情见 [LICENSE](LICENSE)。
