@@ -14,10 +14,6 @@ dist/
 *.spec
 nuitka-crash-report.xml
 
-# Local build metadata
-/build.txt
-/ver.txt
-
 # IDE/editor files
 .idea/
 .vscode/

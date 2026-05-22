@@ -36,6 +36,12 @@ pip install -r requirements.txt
 
 ## 打包
 
+安装打包依赖：
+
+```powershell
+pip install -r requirements-dev.txt
+```
+
 项目使用 PyInstaller 打包，当前构建命令保存在 `build.txt`：
 
 ```powershell
