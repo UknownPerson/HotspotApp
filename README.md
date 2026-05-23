@@ -2,7 +2,8 @@
 
 一个用于 Windows 的开源热点管理小工具，可以快速开启或关闭系统移动热点，并保存热点名称、密码和开机自启动设置。
 
-<img width="322" height="132" alt="HotspotApp screenshot" src="https://github.com/user-attachments/assets/8b0034d0-f1ad-41d3-bc2c-2b2aee37b272" />
+<img width="342" height="132" alt="aa3744b8-2278-4ed9-b0b9-3af735e09348" src="https://github.com/user-attachments/assets/f7281df9-5827-4734-83f3-b011e4535184" />
+
 
 ## 功能
 
