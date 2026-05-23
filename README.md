@@ -2,7 +2,7 @@
 
 一个用于 Windows 的开源热点管理小工具，可以快速开启或关闭系统移动热点，并保存热点名称、密码和开机自启动设置。
 
-<img width="342" height="132" alt="image" src="https://github.com/user-attachments/assets/036b8bfa-b02b-4704-8b9c-3801b4b6ff5c" />
+<img width="342" height="132" alt="image" src="https://github.com/user-attachments/assets/5ffa6586-34ad-47bb-8965-aec328431755" />
 
 ## 功能
 
