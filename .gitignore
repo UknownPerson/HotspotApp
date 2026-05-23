@@ -17,6 +17,7 @@ nuitka-crash-report.xml
 # Local build files
 /build.txt
 /ver.txt
+/requirements-dev.txt
 
 # IDE/editor files
 .idea/
