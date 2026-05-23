@@ -22,11 +22,7 @@ async def getStates():
     internet_connection_profile = NetworkInformation.get_internet_connection_profile()
     if internet_connection_profile is None:
         print("No internet connection profile found.")
-        return False
+        return TetheringOperationalState.UNKNOWN
 
     tethering_manager = NetworkOperatorTetheringManager.create_from_connection_profile(internet_connection_profile)
-
-    if tethering_manager.tethering_operational_state == TetheringOperationalState.ON:
-        return True
-    else:
-        return False
+    return tethering_manager.tethering_operational_state
