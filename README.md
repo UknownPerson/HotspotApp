@@ -11,6 +11,7 @@
 - 保存热点名称和密码
 - 支持开机自启动
 - 启动后可按配置自动开启热点
+- 记录运行日志，方便排查启动失败或热点切换异常
 - 轻量桌面窗口，无需复杂配置
 
 ## 运行环境
@@ -34,6 +35,16 @@ pip install -r requirements.txt
 ```
 
 当前项目依赖 Windows Runtime 相关包，依赖列表见 [requirements.txt](requirements.txt)。
+
+## 日志
+
+程序会将运行日志写入：
+
+```text
+%LOCALAPPDATA%\HotspotApp\logs\HotspotApp.log
+```
+
+如果程序无法启动、窗口闪退，或热点开启/关闭失败，可以查看该日志获取错误信息。
 
 ## 开源协议
 

@@ -2,6 +2,7 @@ import os
 import sys
 import threading
 import webbrowser
+import logging
 
 import customtkinter as ctk
 from ToolTip import ToolTip
@@ -14,6 +15,8 @@ from hotspot import NetworkInformation, NetworkOperatorTetheringManager, Tetheri
 
 import asyncio
 
+logger = logging.getLogger("HotspotApp")
+
 
 def run():
     loop = asyncio.new_event_loop()
@@ -24,20 +27,55 @@ def run():
 
     window = ctk.CTk(fg_color="#f3f3f3")
 
-    saved_ssid, saved_pwd, auto_start = read_config()
+    saved_ssid, saved_pwd, launch_at_startup, auto_enable_hotspot = read_config()
 
     window.ssid_var = tk.StringVar(value=saved_ssid)
     window.pwd_var = tk.StringVar(value=saved_pwd)
-    window.autosave_var = tk.IntVar(value=int(auto_start))
+    window.launch_at_startup_var = tk.IntVar(value=int(launch_at_startup))
+    window.auto_enable_hotspot_var = tk.IntVar(value=int(auto_enable_hotspot))
+    window._save_config_after_id = None
 
-    def on_change(*args):
-        save_config(window.ssid_var.get(), window.pwd_var.get(), window.autosave_var.get())
+    def save_current_config(sync_autostart=False):
+        try:
+            save_config(
+                window.ssid_var.get(),
+                window.pwd_var.get(),
+                window.launch_at_startup_var.get(),
+                window.auto_enable_hotspot_var.get(),
+                sync_autostart=sync_autostart,
+            )
+        except Exception:
+            logger.exception("Failed to save config")
 
-    on_change()
+    def flush_debounced_config():
+        if window._save_config_after_id is not None:
+            try:
+                window.after_cancel(window._save_config_after_id)
+            except Exception:
+                pass
+            window._save_config_after_id = None
+        save_current_config()
 
-    window.ssid_var.trace_add("write", on_change)
-    window.pwd_var.trace_add("write", on_change)
-    window.autosave_var.trace_add("write", on_change)
+    def schedule_config_save(*args):
+        if window._save_config_after_id is not None:
+            try:
+                window.after_cancel(window._save_config_after_id)
+            except Exception:
+                pass
+        window._save_config_after_id = window.after(350, flush_debounced_config)
+
+    def on_launch_at_startup_change(*args):
+        save_current_config(sync_autostart=True)
+
+    def on_auto_enable_hotspot_change(*args):
+        save_current_config()
+
+    save_current_config(sync_autostart=True)
+
+    window.ssid_var.trace_add("write", schedule_config_save)
+    window.pwd_var.trace_add("write", schedule_config_save)
+    window.launch_at_startup_var.trace_add("write", on_launch_at_startup_change)
+    window.auto_enable_hotspot_var.trace_add("write", on_auto_enable_hotspot_change)
 
     window.title_ = '热点'
     window.suffix = ''
@@ -55,6 +93,12 @@ def run():
 
     window.geometry('340x100')
     window.resizable(False, False)
+
+    def on_window_close():
+        flush_debounced_config()
+        window.destroy()
+
+    window.protocol("WM_DELETE_WINDOW", on_window_close)
 
     style = ttk.Style(window)
     for theme_name in ("vista", "xpnative", "winnative"):
@@ -245,15 +289,46 @@ def run():
 
     cbt1 = ttk.Checkbutton(
         window,
-        text="开机自启动\n并打开热点",
-        variable=window.autosave_var,
+        text="",
+        variable=window.launch_at_startup_var,
         style="Hotspot.TCheckbutton",
         takefocus=False,
     )
-    cbt1.place(x=248, y=54, width=90, height=34)
+    cbt1.place(x=256, y=53, width=72, height=18)
 
-    tooltip_text = "勾选后程序会随系统开机自动启动，并且在每次程序打开时自动开启热点。"
-    ToolTip(cbt1, tooltip_text)
+    cbt1_text = ttk.Label(
+        window,
+        text="开机自启",
+        style="Hotspot.TLabel",
+    )
+    cbt1_text.place(x=275, y=51)
+
+    cbt2 = ttk.Checkbutton(
+        window,
+        text="",
+        variable=window.auto_enable_hotspot_var,
+        style="Hotspot.TCheckbutton",
+        takefocus=False,
+    )
+    cbt2.place(x=256, y=71, width=72, height=18)
+
+    cbt2_text = ttk.Label(
+        window,
+        text="启动即开",
+        style="Hotspot.TLabel",
+    )
+    cbt2_text.place(x=275, y=69)
+
+    ToolTip(cbt1, "勾选后程序会随系统开机自动启动，但不开启热点。")
+    ToolTip(cbt2, "勾选后每次打开程序都会自动开启热点。")
+    ToolTip(cbt1_text, "勾选后程序会随系统开机自动启动，但不开启热点。")
+    ToolTip(cbt2_text, "勾选后每次打开程序都会自动开启热点。")
+
+    def toggle_checkbutton(var):
+        var.set(0 if var.get() else 1)
+
+    cbt1_text.bind("<Button-1>", lambda event: toggle_checkbutton(window.launch_at_startup_var), add="+")
+    cbt2_text.bind("<Button-1>", lambda event: toggle_checkbutton(window.auto_enable_hotspot_var), add="+")
 
     def open_link(url):
         webbrowser.open(url)
@@ -266,6 +341,8 @@ def run():
 
     def set_suffix(suffix):
         window.suffix = suffix
+        if suffix:
+            but1.configure(text=suffix)
         refresh_button(0)
 
     men1 = tk.Menu(window, tearoff=0)
@@ -284,7 +361,7 @@ def run():
         return False
 
     def clear_entry_focus(event):
-        widgets_to_keep_focus = (ent1, ent2, cbt1)
+        widgets_to_keep_focus = (ent1, ent2, cbt1, cbt2, cbt1_text, cbt2_text)
         if any(is_descendant(event.widget, widget) for widget in widgets_to_keep_focus):
             return
         window.focus_set()
@@ -317,7 +394,10 @@ def run():
                 state = f.result()
                 window.hotspot_state = state
 
-                if state == TetheringOperationalState.ON:
+                if window.suffix:
+                    button_text = window.suffix
+                    should_disable = True
+                elif state == TetheringOperationalState.ON:
                     button_text = "关闭热点"
                     should_disable = window.suffix != ""
                 elif state == TetheringOperationalState.OFF:
@@ -341,8 +421,8 @@ def run():
                         sync_button_hover_state()
 
                 window.after(0, apply_button_state)
-            except Exception as e:
-                print(e)
+            except Exception:
+                logger.exception("Failed to refresh hotspot state")
 
         future.add_done_callback(done)
         if delay > 0:
@@ -355,19 +435,37 @@ def run():
         future = asyncio.run_coroutine_threadsafe(getStates(), loop)
 
         def done_turnoff(f):
-            code = f.result().status
             window.after(0, lambda: set_suffix(''))
+            try:
+                code = f.result().status
+            except Exception:
+                logger.exception("Failed to turn off hotspot")
+                show_error("错误", "关闭失败，请查看日志。")
+                return
             if code != 0:
+                logger.error("Failed to turn off hotspot, status code: %s", code)
                 show_error("错误", "关闭失败，错误码{}。".format(code))
 
         def done_turnon(f):
-            code = f.result().status
             window.after(0, lambda: set_suffix(''))
+            try:
+                code = f.result().status
+            except Exception:
+                logger.exception("Failed to turn on hotspot")
+                show_error("错误", "开启失败，请查看日志。")
+                return
             if code != 0:
+                logger.error("Failed to turn on hotspot, status code: %s", code)
                 show_error("错误", "开启失败，错误码{}。".format(code))
 
         def decide(f):
-            state = f.result()
+            try:
+                state = f.result()
+            except Exception:
+                logger.exception("Failed to read hotspot state before toggling")
+                show_error("错误", "读取热点状态失败，请查看日志。")
+                return
+
             if is_transition_state(state):
                 show_warning("提示", "热点状态正在切换，请稍后再试。")
                 return
@@ -375,12 +473,17 @@ def run():
                 show_error("错误", "当前热点状态未知，请稍后再试。")
                 return
 
-            internet_connection_profile = NetworkInformation.get_internet_connection_profile()
-            if internet_connection_profile is None:
-                show_error("错误", "当前无网络连接，无法开启。")
+            try:
+                internet_connection_profile = NetworkInformation.get_internet_connection_profile()
+                if internet_connection_profile is None:
+                    show_error("错误", "当前无网络连接，无法开启。")
+                    return
+                tethering_manager = NetworkOperatorTetheringManager.create_from_connection_profile(
+                    internet_connection_profile)
+            except Exception:
+                logger.exception("Failed to create tethering manager")
+                show_error("错误", "获取热点管理器失败，请查看日志。")
                 return
-            tethering_manager = NetworkOperatorTetheringManager.create_from_connection_profile(
-                internet_connection_profile)
 
             if state == TetheringOperationalState.ON:
                 window.after(0, lambda: set_suffix('关闭中...'))
@@ -403,7 +506,16 @@ def run():
     but1.configure(command=on_button_click)
     window.after(0, refresh_button, 1000)
 
-    if window.autosave_var.get() == 1 and asyncio.run_coroutine_threadsafe(getStates(), loop).result() == TetheringOperationalState.OFF:
+    try:
+        should_auto_enable = (
+            window.auto_enable_hotspot_var.get() == 1
+            and asyncio.run_coroutine_threadsafe(getStates(), loop).result() == TetheringOperationalState.OFF
+        )
+    except Exception:
+        logger.exception("Failed to run startup auto-enable check")
+        should_auto_enable = False
+
+    if should_auto_enable:
         but1.invoke()
 
     window.mainloop()
